@@ -913,7 +913,7 @@ const POLYFILL_REQUEST_SESSION_ERROR =
 or navigator.xr.requestSession('inline') prior to requesting an immersive
 session. This is a limitation specific to the WebXR Polyfill and does not apply
 to native implementations of the API.`;
-class XR extends EventTarget {
+class XRSystem extends EventTarget {
   constructor(devicePromise) {
     super();
     this[PRIVATE$4] = {
@@ -1342,10 +1342,10 @@ class XRSession$1 extends EventTarget {
       }
       this[PRIVATE$15].ended = true;
       this[PRIVATE$15].stopDeviceFrameLoop();
-      device.removeEventListener('@webvr-polyfill/vr-present-end', this[PRIVATE$15].onPresentationEnd);
-      device.removeEventListener('@webvr-polyfill/vr-present-start', this[PRIVATE$15].onPresentationStart);
-      device.removeEventListener('@@webvr-polyfill/input-select-start', this[PRIVATE$15].onSelectStart);
-      device.removeEventListener('@@webvr-polyfill/input-select-end', this[PRIVATE$15].onSelectEnd);
+      device.removeEventListener('@@webxr-polyfill/vr-present-end', this[PRIVATE$15].onPresentationEnd);
+      device.removeEventListener('@@webxr-polyfill/vr-present-start', this[PRIVATE$15].onPresentationStart);
+      device.removeEventListener('@@webxr-polyfill/input-select-start', this[PRIVATE$15].onSelectStart);
+      device.removeEventListener('@@webxr-polyfill/input-select-end', this[PRIVATE$15].onSelectEnd);
       this.dispatchEvent('end', new XRSessionEvent('end', { session: this }));
     };
     device.addEventListener('@@webxr-polyfill/vr-present-end', this[PRIVATE$15].onPresentationEnd);
@@ -1470,13 +1470,13 @@ class XRSession$1 extends EventTarget {
     }
     if (this[PRIVATE$15].immersive) {
       this[PRIVATE$15].ended = true;
-      this[PRIVATE$15].device.removeEventListener('@@webvr-polyfill/vr-present-start',
+      this[PRIVATE$15].device.removeEventListener('@@webxr-polyfill/vr-present-start',
                                                  this[PRIVATE$15].onPresentationStart);
-      this[PRIVATE$15].device.removeEventListener('@@webvr-polyfill/vr-present-end',
+      this[PRIVATE$15].device.removeEventListener('@@webxr-polyfill/vr-present-end',
                                                  this[PRIVATE$15].onPresentationEnd);
-      this[PRIVATE$15].device.removeEventListener('@@webvr-polyfill/input-select-start',
+      this[PRIVATE$15].device.removeEventListener('@@webxr-polyfill/input-select-start',
                                                  this[PRIVATE$15].onSelectStart);
-      this[PRIVATE$15].device.removeEventListener('@@webvr-polyfill/input-select-end',
+      this[PRIVATE$15].device.removeEventListener('@@webxr-polyfill/input-select-end',
                                                  this[PRIVATE$15].onSelectEnd);
       this.dispatchEvent('end', new XRSessionEvent('end', { session: this }));
     }
@@ -1585,7 +1585,7 @@ class XRReferenceSpaceEvent extends Event {
 }
 
 var API = {
-  XR,
+  XRSystem,
   XRSession: XRSession$1,
   XRSessionEvent,
   XRFrame,
@@ -1672,6 +1672,16 @@ class WebXRPolyfill {
         if (global.WebGL2RenderingContext){
           polyfillMakeXRCompatible(global.WebGL2RenderingContext);
         }
+        if (!window.isSecureContext) {
+          console.warn(`WebXR Polyfill Warning:
+This page is not running in a secure context (https:// or localhost)!
+This means that although the page may be able to use the WebXR Polyfill it will
+not be able to use native WebXR implementations, and as such will not be able to
+access dedicated VR or AR hardware, and will not be able to take advantage of
+any performance improvements a native WebXR implementation may offer. Please
+host this content on a secure origin for the best user experience.
+`);
+        }
       }
     }
     this.injected = true;
@@ -1679,7 +1689,7 @@ class WebXRPolyfill {
   }
   _patchNavigatorXR() {
     let devicePromise = requestXRDevice(this.global, this.config);
-    this.xr = new API.XR(devicePromise);
+    this.xr = new API.XRSystem(devicePromise);
     Object.defineProperty(this.global.navigator, 'xr', {
       value: this.xr,
       configurable: true,
