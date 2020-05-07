@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-import CardboardXRDevice from './devices/CardboardXRDevice';
-import InlineDevice from './devices/InlineDevice';
-import WebVRDevice from './devices/WebVRDevice';
+// Note: webxr-ios-js doesn't need them. Commenting out to reduce the file size.
+//import CardboardXRDevice from './devices/CardboardXRDevice';
+//import InlineDevice from './devices/InlineDevice';
+//import WebVRDevice from './devices/WebVRDevice';
 
 import { isMobile } from './utils';
 
@@ -23,19 +24,19 @@ import { isMobile } from './utils';
  * Queries browser to see if any VRDisplay exists.
  * Resolves to a polyfilled XRDevice or null.
  */
-const getWebVRDevice = async function (global) {
-  let device = null;
-  if ('getVRDisplays' in global.navigator) {
-    try {
-      const displays = await global.navigator.getVRDisplays();
-      if (displays && displays.length) {
-        device = new WebVRDevice(global, displays[0]);
-      }
-    } catch (e) {}
-  }
-
-  return device;
-};
+//const getWebVRDevice = async function (global) {
+//  let device = null;
+//  if ('getVRDisplays' in global.navigator) {
+//    try {
+//      const displays = await global.navigator.getVRDisplays();
+//      if (displays && displays.length) {
+//        device = new WebVRDevice(global, displays[0]);
+//      }
+//    } catch (e) {}
+//  }
+//
+//  return device;
+//};
 
 /**
  * Return an XRDevice interface based off of configuration
@@ -47,35 +48,35 @@ const getWebVRDevice = async function (global) {
  */
 export const requestXRDevice = async function (global, config) {
   // Check for a 1.1 VRDisplay.
-  if (config.webvr) {
-    let xr = await getWebVRDevice(global);
-    if (xr) {
-      return xr;
-    }
-  }
+//  if (config.webvr) {
+//    let xr = await getWebVRDevice(global);
+//    if (xr) {
+//      return xr;
+//    }
+//  }
 
   // If no WebVR devices are present, check to see if a Cardboard device is
   // allowed and if so return that.
   // TODO: This probably requires more changes to allow creating an
   // immersive session in a headset that gets connected later.
-  let mobile = isMobile(global);
-  if ((mobile && config.cardboard) ||
-      (!mobile && config.allowCardboardOnDesktop)) {
+//  let mobile = isMobile(global);
+//  if ((mobile && config.cardboard) ||
+//      (!mobile && config.allowCardboardOnDesktop)) {
     // If we're on Cardboard, make sure that VRFrameData is a global
-    if (!global.VRFrameData) {
-      global.VRFrameData = function () {
-        this.rightViewMatrix = new Float32Array(16);
-        this.leftViewMatrix = new Float32Array(16);
-        this.rightProjectionMatrix = new Float32Array(16);
-        this.leftProjectionMatrix = new Float32Array(16);
-        this.pose = null;
-      };
-    }
-
-    return new CardboardXRDevice(global, config.cardboardConfig);
-  }
+//    if (!global.VRFrameData) {
+//      global.VRFrameData = function () {
+//        this.rightViewMatrix = new Float32Array(16);
+//        this.leftViewMatrix = new Float32Array(16);
+//        this.rightProjectionMatrix = new Float32Array(16);
+//        this.leftProjectionMatrix = new Float32Array(16);
+//        this.pose = null;
+//      };
+//    }
+//
+//    return new CardboardXRDevice(global, config.cardboardConfig);
+//  }
 
   // Inline sessions are always allowed, so if no other device is available
   // create one that only supports sensorless inline sessions.
-  return new InlineDevice(global);
+//  return new InlineDevice(global);
 }
