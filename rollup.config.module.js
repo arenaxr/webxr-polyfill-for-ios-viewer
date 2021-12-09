@@ -15,10 +15,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import commonjs from 'rollup-plugin-commonjs';
-import replace from 'rollup-plugin-replace';
-import resolve from 'rollup-plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import replace from '@rollup/plugin-replace';
 import cleanup from 'rollup-plugin-cleanup';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 const banner = fs.readFileSync(path.join(__dirname, 'licenses.txt'));
 
 export default {
@@ -32,7 +32,7 @@ export default {
     replace({
       'process.env.NODE_ENV': JSON.stringify('production'),
     }),
-    resolve(),
+    nodeResolve(),
     commonjs(),
     cleanup({
       comments: 'none',
