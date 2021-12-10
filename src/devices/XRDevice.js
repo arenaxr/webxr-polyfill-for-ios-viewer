@@ -119,6 +119,14 @@ export default class XRDevice extends EventTarget {
   endSession(sessionId) { throw new Error('Not implemented'); }
 
   /**
+   * Allows the XRDevice to override the XRSession's view spaces.
+   *
+   * @param {XRSessionMode} mode
+   * @return {Array<XRSpace> | undefined}
+   */
+  getViewSpaces(mode) { return undefined; }
+
+  /**
    * Takes a XREye and a target to apply properties of
    * `x`, `y`, `width` and `height` on. Returns a boolean
    * indicating if it successfully was able to populate
@@ -128,15 +136,17 @@ export default class XRDevice extends EventTarget {
    * @param {XREye} eye
    * @param {XRWebGLLayer} layer
    * @param {Object?} target
+   * @param {number} viewIndex
    * @return {boolean}
    */
-  getViewport(sessionId, eye, layer, target) { throw new Error('Not implemented'); }
+  getViewport(sessionId, eye, layer, target, viewIndex) { throw new Error('Not implemented'); }
 
   /**
    * @param {XREye} eye
+   * @param {number} viewIndex
    * @return {Float32Array}
    */
-  getProjectionMatrix(eye) { throw new Error('Not implemented'); }
+  getProjectionMatrix(eye, viewIndex) { throw new Error('Not implemented'); }
 
   /**
    * Get model matrix unaffected by frame of reference.
